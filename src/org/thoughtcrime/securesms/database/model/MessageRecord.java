@@ -24,7 +24,6 @@ import android.text.style.StyleSpan;
 
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.database.MmsSmsColumns;
-import org.thoughtcrime.securesms.database.SmsDatabase;
 import org.thoughtcrime.securesms.database.documents.NetworkFailure;
 import org.thoughtcrime.securesms.database.documents.IdentityKeyMismatch;
 import org.thoughtcrime.securesms.recipients.Recipient;
@@ -115,7 +114,7 @@ public abstract class MessageRecord extends DisplayRecord {
   }
 
   public boolean isPush() {
-    return SmsDatabase.Types.isPushType(type) && !SmsDatabase.Types.isForcedSms(type);
+    return MmsSmsColumns.Types.isPushType(type) && !MmsSmsColumns.Types.isForcedSms(type);
   }
 
   public long getTimestamp() {
@@ -124,15 +123,15 @@ public abstract class MessageRecord extends DisplayRecord {
   }
 
   public boolean isForcedSms() {
-    return SmsDatabase.Types.isForcedSms(type);
+    return MmsSmsColumns.Types.isForcedSms(type);
   }
 
   public boolean isStaleKeyExchange() {
-    return SmsDatabase.Types.isStaleKeyExchange(type);
+    return MmsSmsColumns.Types.isStaleKeyExchange(type);
   }
 
   public boolean isProcessedKeyExchange() {
-    return SmsDatabase.Types.isProcessedKeyExchange(type);
+    return MmsSmsColumns.Types.isProcessedKeyExchange(type);
   }
 
   public boolean isIdentityMismatchFailure() {
@@ -140,19 +139,19 @@ public abstract class MessageRecord extends DisplayRecord {
   }
 
   public boolean isBundleKeyExchange() {
-    return SmsDatabase.Types.isBundleKeyExchange(type);
+    return MmsSmsColumns.Types.isBundleKeyExchange(type);
   }
 
   public boolean isIdentityUpdate() {
-    return SmsDatabase.Types.isIdentityUpdate(type);
+    return MmsSmsColumns.Types.isIdentityUpdate(type);
   }
 
   public boolean isCorruptedKeyExchange() {
-    return SmsDatabase.Types.isCorruptedKeyExchange(type);
+    return MmsSmsColumns.Types.isCorruptedKeyExchange(type);
   }
 
   public boolean isInvalidVersionKeyExchange() {
-    return SmsDatabase.Types.isInvalidVersionKeyExchange(type);
+    return MmsSmsColumns.Types.isInvalidVersionKeyExchange(type);
   }
 
   public Recipient getIndividualRecipient() {
