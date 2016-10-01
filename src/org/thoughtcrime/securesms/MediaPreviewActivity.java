@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import org.thoughtcrime.securesms.components.ZoomingImageView;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
+import org.thoughtcrime.securesms.mms.PartAuthority;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.Recipient.RecipientModifiedListener;
 import org.thoughtcrime.securesms.recipients.RecipientFactory;
@@ -195,11 +196,12 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     MenuItem shareItem = menu.findItem(R.id.action_share);
     ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
-    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-    shareIntent.setType(mediaType);
-    shareIntent.putExtra(Intent.EXTRA_STREAM, mediaUri);
+    Intent intent = new Intent(Intent.ACTION_SEND);
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    intent.setType(mediaType);
+    intent.putExtra(Intent.EXTRA_STREAM, PartAuthority.getAttachmentPublicUri(mediaUri));
 
-    shareActionProvider.setShareIntent(shareIntent);
+    shareActionProvider.setShareIntent(intent);
   }
 
   @Override
