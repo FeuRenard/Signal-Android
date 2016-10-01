@@ -24,8 +24,6 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -187,21 +185,16 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     MenuInflater inflater = this.getMenuInflater();
     inflater.inflate(R.menu.media_preview, menu);
 
-    initializeShareAction(menu);
-
     return true;
   }
 
-  private void initializeShareAction(Menu menu) {
-    MenuItem shareItem = menu.findItem(R.id.action_share);
-    ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-
+  private void share() {
     Intent intent = new Intent(Intent.ACTION_SEND);
     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
     intent.setType(mediaType);
     intent.putExtra(Intent.EXTRA_STREAM, PartAuthority.getAttachmentPublicUri(mediaUri));
 
-    shareActionProvider.setShareIntent(intent);
+    startActivity(intent);
   }
 
   @Override
@@ -210,6 +203,7 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
     switch (item.getItemId()) {
     case R.id.save:         saveToDisk(); return true;
+    case R.id.share:        share();      return true;
     case android.R.id.home: finish();     return true;
     }
 
