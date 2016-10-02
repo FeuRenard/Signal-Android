@@ -18,7 +18,11 @@ public class PartUriParser {
   }
 
   private long getId() {
-    return ContentUris.parseId(uri);
+    try {
+      return ContentUris.parseId(uri);
+    } catch (NumberFormatException e) {
+      return Long.parseLong(uri.getPathSegments().get(2));
+    }
   }
 
   private long getUniqueId() {

@@ -192,9 +192,9 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     Intent intent = new Intent(Intent.ACTION_SEND);
     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
     intent.setType(mediaType);
-    intent.putExtra(Intent.EXTRA_STREAM, PartAuthority.getAttachmentPublicUri(mediaUri));
+    intent.putExtra(Intent.EXTRA_STREAM, PartAuthority.getAttachmentPublicUriWithExtension(mediaUri));
 
-    startActivity(intent);
+    startActivity(Intent.createChooser(intent, "Choo-choo-choose me!"));
   }
 
   @Override

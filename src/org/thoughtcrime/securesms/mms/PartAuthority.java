@@ -67,6 +67,11 @@ public class PartAuthority {
     return PartProvider.getContentUri(partUri.getPartId());
   }
 
+  public static Uri getAttachmentPublicUriWithExtension(Uri uri) {
+    PartUriParser partUri = new PartUriParser(uri);
+    return PartProvider.getContentUriWithExtension(partUri.getPartId());
+  }
+
   public static Uri getAttachmentDataUri(AttachmentId attachmentId) {
     Uri uri = Uri.withAppendedPath(PART_CONTENT_URI, String.valueOf(attachmentId.getUniqueId()));
     return ContentUris.withAppendedId(uri, attachmentId.getRowId());
