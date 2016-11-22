@@ -24,6 +24,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,10 +47,13 @@ import org.thoughtcrime.securesms.video.VideoPlayer;
 
 import java.io.IOException;
 
+import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
+
 /**
  * Activity for displaying media attachments in-app
  */
-public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity implements RecipientModifiedListener {
+public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity
+                                  implements RecipientModifiedListener, OnPhotoTapListener {
   private final static String TAG = MediaPreviewActivity.class.getSimpleName();
 
   public static final String RECIPIENT_EXTRA = "recipient";
@@ -239,6 +243,17 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
     return false;
   }
+
+  @Override
+  public void onPhotoTap(View view, float x, float y) {
+    System.out.println("onPhotoTap(view,"+x+","+y+")");
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar.isShowing()) actionBar.hide();
+    else                       actionBar.show();
+  }
+
+//  @Override //from PhotoView v1.2.5 on
+  public void onBesidePhotoTap() {}
 
   public static boolean isContentTypeSupported(final String contentType) {
     return contentType != null && (contentType.startsWith("image/") || contentType.startsWith("video/"));

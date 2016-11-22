@@ -100,6 +100,7 @@ public class ZoomingImageView extends FrameLayout {
   }
 
   private void setImageViewUri(MasterSecret masterSecret, Uri uri) {
+    imageViewAttacher.setOnPhotoTapListener((PhotoViewAttacher.OnPhotoTapListener) super.getContext());
     subsamplingImageView.setVisibility(View.GONE);
     imageView.setVisibility(View.VISIBLE);
 
