@@ -1172,6 +1172,7 @@
     <string name="preferences_chats__when_using_wifi">When using Wi-Fi</string>
     <string name="preferences_chats__when_roaming">When roaming</string>
     <string name="preferences_chats__media_auto_download">Media auto-download</string>
+    <string name="preferences_chats__animated_giphy_preview">Animated Giphy preview</string>
     <string name="preferences_chats__message_trimming">Message trimming</string>
     <string name="preferences_advanced__use_system_emoji">Use system emoji</string>
     <string name="preferences_advanced__disable_signal_built_in_emoji_support">Disable Signal\'s built-in emoji support</string>

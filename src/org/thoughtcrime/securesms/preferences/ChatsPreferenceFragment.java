@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceGroup;
 import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -15,6 +16,7 @@ import org.thoughtcrime.securesms.ApplicationPreferencesActivity;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.thoughtcrime.securesms.util.Trimmer;
+import org.thoughtcrime.securesms.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,8 @@ public class ChatsPreferenceFragment extends PreferenceFragment {
         .setOnPreferenceChangeListener(new MediaDownloadChangeListener());
     findPreference(TextSecurePreferences.MEDIA_DOWNLOAD_ROAMING_PREF)
         .setOnPreferenceChangeListener(new MediaDownloadChangeListener());
+    findPreference(TextSecurePreferences.MEDIA_DOWNLOAD_GIPHY_PREF)
+        .setOnPreferenceChangeListener(new GiphyDownloadChangeListener());
 
     findPreference(TextSecurePreferences.THREAD_TRIM_NOW)
         .setOnPreferenceClickListener(new TrimNowClickListener());
@@ -47,6 +51,7 @@ public class ChatsPreferenceFragment extends PreferenceFragment {
     super.onResume();
     ((ApplicationPreferencesActivity)getActivity()).getSupportActionBar().setTitle(R.string.preferences__chats);
     setMediaDownloadSummaries();
+//    setCategoryVisibility();
   }
 
   private void setMediaDownloadSummaries() {
@@ -56,11 +61,33 @@ public class ChatsPreferenceFragment extends PreferenceFragment {
         .setSummary(getSummaryForMediaPreference(TextSecurePreferences.getWifiMediaDownloadAllowed(getActivity())));
     findPreference(TextSecurePreferences.MEDIA_DOWNLOAD_ROAMING_PREF)
         .setSummary(getSummaryForMediaPreference(TextSecurePreferences.getRoamingMediaDownloadAllowed(getActivity())));
+    findPreference(TextSecurePreferences.MEDIA_DOWNLOAD_GIPHY_PREF)
+        .setSummary(getSummaryForGiphyPreference(TextSecurePreferences.getGiphyMediaDownloadAllowed(getActivity())));
+  }
+
+  private void setCategoryVisibility() {
+    Preference giphyPreference = this.findPreference(TextSecurePreferences.MEDIA_DOWNLOAD_GIPHY_PREF);
+    if (giphyPreference != null && Util.isLowMemory(getActivity())) {
+      ((PreferenceGroup)getPreferenceScreen().findPreference("media_download")).removePreference(giphyPreference);
+    }
   }
 
   private CharSequence getSummaryForMediaPreference(Set<String> allowedNetworks) {
     String[]     keys      = getResources().getStringArray(R.array.pref_media_download_entries);
     String[]     values    = getResources().getStringArray(R.array.pref_media_download_values);
+    List<String> outValues = new ArrayList<>(allowedNetworks.size());
+
+    for (int i=0; i < keys.length; i++) {
+      if (allowedNetworks.contains(keys[i])) outValues.add(values[i]);
+    }
+
+    return outValues.isEmpty() ? getResources().getString(R.string.preferences__none)
+                               : TextUtils.join(", ", outValues);
+  }
+
+  private CharSequence getSummaryForGiphyPreference(Set<String> allowedNetworks) {
+    String[] keys   = getResources().getStringArray(R.array.pref_media_download_giphy_entries);
+    String[] values = getResources().getStringArray(R.array.pref_media_download_giphy_values);
     List<String> outValues = new ArrayList<>(allowedNetworks.size());
 
     for (int i=0; i < keys.length; i++) {
@@ -99,6 +126,15 @@ public class ChatsPreferenceFragment extends PreferenceFragment {
     @Override public boolean onPreferenceChange(Preference preference, Object newValue) {
       Log.w(TAG, "onPreferenceChange");
       preference.setSummary(getSummaryForMediaPreference((Set<String>)newValue));
+      return true;
+    }
+  }
+
+  private class GiphyDownloadChangeListener implements OnPreferenceChangeListener {
+    @SuppressWarnings("unchecked")
+    @Override public boolean onPreferenceChange(Preference preference, Object newValue) {
+      Log.w(TAG, "onPreferenceChange");
+      preference.setSummary(getSummaryForGiphyPreference((Set<String>)newValue));
       return true;
     }
   }

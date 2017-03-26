@@ -25,6 +25,14 @@
                 android:persistent="true"
                 android:entries="@array/pref_media_download_values"
                 android:entryValues="@array/pref_media_download_entries" />
+
+        <com.h6ah4i.android.compat.preference.MultiSelectListPreferenceCompat
+                android:title="@string/preferences_chats__animated_giphy_preview"
+                android:key="pref_media_download_giphy"
+                android:defaultValue="@array/pref_media_download_giphy_default"
+                android:persistent="true"
+                android:entries="@array/pref_media_download_giphy_values"
+                android:entryValues="@array/pref_media_download_giphy_entries" />
     </PreferenceCategory>
 
     <PreferenceCategory android:key="message_trimming" android:title="@string/preferences_chats__message_trimming">

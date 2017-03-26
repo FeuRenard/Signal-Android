@@ -41,34 +41,47 @@ public class MediaNetworkRequirement implements Requirement, ContextDependent {
     this.context = context;
   }
 
-  private NetworkInfo getNetworkInfo() {
+  private static NetworkInfo getNetworkInfo(Context context) {
     return ServiceUtil.getConnectivityManager(context).getActiveNetworkInfo();
   }
 
-  public boolean isConnectedWifi() {
-    final NetworkInfo info = getNetworkInfo();
+  private static boolean isConnectedWifi(Context context) {
+    final NetworkInfo info = getNetworkInfo(context);
     return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
   }
 
-  public boolean isConnectedMobile() {
-    final NetworkInfo info = getNetworkInfo();
+  private static boolean isConnectedMobile(Context context) {
+    final NetworkInfo info = getNetworkInfo(context);
     return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE;
   }
 
-  public boolean isConnectedRoaming() {
-    final NetworkInfo info = getNetworkInfo();
+  private static boolean isConnectedRoaming(Context context) {
+    final NetworkInfo info = getNetworkInfo(context);
     return info != null && info.isConnected() && info.isRoaming() && info.getType() == ConnectivityManager.TYPE_MOBILE;
   }
 
   private @NonNull Set<String> getAllowedAutoDownloadTypes() {
-    if (isConnectedWifi()) {
+    if (isConnectedWifi(context)) {
       return TextSecurePreferences.getWifiMediaDownloadAllowed(context);
-    } else if (isConnectedRoaming()) {
+    } else if (isConnectedRoaming(context)) {
       return TextSecurePreferences.getRoamingMediaDownloadAllowed(context);
-    } else if (isConnectedMobile()) {
+    } else if (isConnectedMobile(context)) {
       return TextSecurePreferences.getMobileMediaDownloadAllowed(context);
     } else {
       return Collections.emptySet();
+    }
+  }
+
+  public static @NonNull boolean isAllowedToShowAnimatedGiphyPreview(Context context) {
+    Set<String> allowedNetworks = TextSecurePreferences.getGiphyMediaDownloadAllowed(context);
+    if (isConnectedWifi(context)) {
+      return allowedNetworks.contains("wifi");
+    } else if (isConnectedRoaming(context)) {
+      return allowedNetworks.contains("roaming");
+    } else if (isConnectedMobile(context)) {
+      return allowedNetworks.contains("mobile");
+    } else {
+      return false;
     }
   }
 

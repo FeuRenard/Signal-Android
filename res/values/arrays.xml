@@ -214,6 +214,18 @@
       <item>@string/arrays__video</item>
   </string-array>
 
+  <string-array name="pref_media_download_giphy_entries">
+      <item>mobile</item>
+      <item>wifi</item>
+      <item>roaming</item>
+  </string-array>
+
+  <string-array name="pref_media_download_giphy_values">
+      <item>@string/preferences_chats__when_using_mobile_data</item>
+      <item>@string/preferences_chats__when_using_wifi</item>
+      <item>@string/preferences_chats__when_roaming</item>
+  </string-array>
+
   <string-array name="pref_media_download_mobile_data_default">
       <item>image</item>
   </string-array>
@@ -225,6 +237,11 @@
   </string-array>
 
   <string-array name="pref_media_download_roaming_default" />
+
+  <string-array name="pref_media_download_giphy_default">
+      <item>mobile</item>
+      <item>wifi</item>
+  </string-array>
 
     <!-- RedPhone -->
 

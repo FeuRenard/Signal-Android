@@ -21,6 +21,7 @@ import com.bumptech.glide.request.target.Target;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.color.MaterialColor;
 import org.thoughtcrime.securesms.giph.model.GiphyImage;
+import org.thoughtcrime.securesms.jobs.requirements.MediaNetworkRequirement;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.util.ViewUtil;
 
@@ -137,7 +138,7 @@ public class GiphyAdapter extends RecyclerView.Adapter<GiphyAdapter.GiphyViewHol
     DrawableRequestBuilder<String> thumbnailRequest = Glide.with(context)
                                                            .load(image.getStillUrl());
 
-    if (Util.isLowMemory(context)) {
+    if (Util.isLowMemory(context) || !MediaNetworkRequirement.isAllowedToShowAnimatedGiphyPreview(context)) {
       Glide.with(context)
            .load(image.getStillUrl())
            .placeholder(new ColorDrawable(Util.getRandomElement(MaterialColor.values()).toConversationColor(context)))
