@@ -100,7 +100,6 @@ public class ZoomingImageView extends FrameLayout {
   }
 
   private void setImageViewUri(MasterSecret masterSecret, Uri uri) {
-    imageViewAttacher.setOnPhotoTapListener((PhotoViewAttacher.OnPhotoTapListener) super.getContext());
     subsamplingImageView.setVisibility(View.GONE);
     imageView.setVisibility(View.VISIBLE);
 
@@ -128,5 +127,13 @@ public class ZoomingImageView extends FrameLayout {
   public void cleanup() {
     imageView.setImageDrawable(null);
     subsamplingImageView.recycle();
+  }
+
+  public void setOnViewTapListener(PhotoViewAttacher.OnViewTapListener l) {
+    imageViewAttacher.setOnViewTapListener(l);
+  }
+
+  public void setOnClickListener(OnClickListener l) {
+    subsamplingImageView.setOnClickListener(l);
   }
 }

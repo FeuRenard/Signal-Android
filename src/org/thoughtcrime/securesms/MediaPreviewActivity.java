@@ -30,8 +30,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 
 import org.thoughtcrime.securesms.components.ZoomingImageView;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
@@ -47,13 +50,12 @@ import org.thoughtcrime.securesms.video.VideoPlayer;
 
 import java.io.IOException;
 
-import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Activity for displaying media attachments in-app
  */
-public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity
-                                  implements RecipientModifiedListener, OnPhotoTapListener {
+public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity implements RecipientModifiedListener {
   private final static String TAG = MediaPreviewActivity.class.getSimpleName();
 
   public static final String RECIPIENT_EXTRA = "recipient";
@@ -81,22 +83,54 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity
     this.setTheme(R.style.TextSecure_DarkTheme);
     dynamicLanguage.onCreate(this);
 
-    setFullscreenIfPossible();
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                         WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     setContentView(R.layout.media_preview_activity);
 
-    initializeViews();
     initializeResources();
+    hideFullscreenIfPossible();
+    initializeViews();
     initializeActionBar();
   }
 
   @TargetApi(VERSION_CODES.JELLY_BEAN)
+  private void toggleFullscreen() {
+    if ( (getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+      setFullscreenIfPossible();
+    } else {
+      hideFullscreenIfPossible();
+    }
+
+  }
+
   private void setFullscreenIfPossible() {
+    int visibilityFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+
+    if (mediaType != null && mediaType.startsWith("image/")) {
+      visibilityFlags |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+      if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+        visibilityFlags |= View.SYSTEM_UI_FLAG_IMMERSIVE;
+      }
+    }
+
     if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-      getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+      visibilityFlags |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                         View.SYSTEM_UI_FLAG_FULLSCREEN;
+      getWindow().getDecorView().setSystemUiVisibility(visibilityFlags);
+    } else {
+      getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+  }
+
+  private void hideFullscreenIfPossible() {
+    int visibilityFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+
+    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+      visibilityFlags |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+      if (mediaType != null && mediaType.startsWith("image/")) {
+        visibilityFlags |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+      }
+      getWindow().getDecorView().setSystemUiVisibility(visibilityFlags);
     }
   }
 
@@ -144,6 +178,31 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity
   private void initializeViews() {
     image = (ZoomingImageView) findViewById(R.id.image);
     video = (VideoPlayer) findViewById(R.id.video_player);
+
+    video.setPlaybackControlVisibilityListener(new PlaybackControlView.VisibilityListener() {
+      @Override
+      public void onVisibilityChange(int visibility) {
+        if (visibility == View.VISIBLE) {
+          hideFullscreenIfPossible();
+        } else {
+          setFullscreenIfPossible();
+        }
+      }
+    });
+
+    image.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        toggleFullscreen();
+      }
+    });
+
+    image.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
+      @Override
+      public void onViewTap(View view, float v, float v1) {
+        toggleFullscreen();
+      }
+    });
   }
 
   private void initializeResources() {
@@ -243,17 +302,6 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity
 
     return false;
   }
-
-  @Override
-  public void onPhotoTap(View view, float x, float y) {
-    System.out.println("onPhotoTap(view,"+x+","+y+")");
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar.isShowing()) actionBar.hide();
-    else                       actionBar.show();
-  }
-
-//  @Override //from PhotoView v1.2.5 on
-  public void onBesidePhotoTap() {}
 
   public static boolean isContentTypeSupported(final String contentType) {
     return contentType != null && (contentType.startsWith("image/") || contentType.startsWith("video/"));
