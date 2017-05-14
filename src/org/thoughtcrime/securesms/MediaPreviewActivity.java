@@ -24,6 +24,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
@@ -83,6 +84,7 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     this.setTheme(R.style.TextSecure_DarkTheme);
     dynamicLanguage.onCreate(this);
 
+    setFullscreenIfPossible();
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     setContentView(R.layout.media_preview_activity);
 
@@ -90,6 +92,14 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     hideFullscreenIfPossible();
     initializeViews();
     initializeActionBar();
+  }
+
+  @TargetApi(VERSION_CODES.JELLY_BEAN)
+  private void setFullscreenIfPossible() {
+    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN && VERSION.SDK_INT < VERSION_CODES.KITKAT) {
+      getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+      supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+    }
   }
 
   @TargetApi(VERSION_CODES.JELLY_BEAN)
@@ -102,14 +112,14 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
   }
 
-  private void setFullscreenIfPossible() {
+  private void setImmersiveIfPossible() {
     int visibilityFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
     if (mediaType != null && mediaType.startsWith("image/")) {
       visibilityFlags |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                          View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
       if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
-        visibilityFlags |= View.SYSTEM_UI_FLAG_IMMERSIVE;
+//        visibilityFlags |= View.SYSTEM_UI_FLAG_IMMERSIVE;
       }
     }
 
