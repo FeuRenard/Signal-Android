@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -47,8 +48,9 @@ public class VideoPlayer extends FrameLayout {
   @Nullable private final VideoView           videoView;
   @Nullable private final SimpleExoPlayerView exoView;
 
-  @Nullable private       SimpleExoPlayer     exoPlayer;
-  @Nullable private       AttachmentServer    attachmentServer;
+  @Nullable private       SimpleExoPlayer           exoPlayer;
+  @Nullable private       AttachmentServer          attachmentServer;
+  @Nullable private       PlaybackControlViewCompat mediaController;
 
   public VideoPlayer(Context context) {
     this(context, null);
@@ -136,7 +138,7 @@ public class VideoPlayer extends FrameLayout {
   }
 
   private void initializeVideoViewControls(@NonNull VideoView videoView) {
-    MediaController mediaController = new MediaController(getContext());
+    mediaController = new PlaybackControlViewCompat(getContext());
     mediaController.setAnchorView(videoView);
     mediaController.setMediaPlayer(videoView);
 
@@ -144,6 +146,35 @@ public class VideoPlayer extends FrameLayout {
   }
 
   public void setPlaybackControlVisibilityListener(VisibilityListener listener) {
-    if (exoView != null) exoView.setControllerVisibilityListener(listener);
+    if (exoView != null)         exoView.setControllerVisibilityListener(listener);
+    if (mediaController != null) mediaController.setVisibilityListener(listener);
+  }
+
+  private class PlaybackControlViewCompat extends MediaController {
+    private VisibilityListener visibilityListener;
+
+    private PlaybackControlViewCompat(Context context) {
+      super(context);
+    }
+
+    @Override
+    public void show(int timeout) {
+      super.show(timeout);
+      notifyVisibilityListener(View.VISIBLE);
+    }
+
+    @Override
+    public void hide() {
+      super.hide();
+      notifyVisibilityListener(View.GONE);
+    }
+
+    private void setVisibilityListener(VisibilityListener listener) {
+      this.visibilityListener = listener;
+    }
+
+    private void notifyVisibilityListener(int visibility) {
+      if (visibilityListener != null) visibilityListener.onVisibilityChange(visibility);
+    }
   }
 }
