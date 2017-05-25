@@ -1,7 +1,9 @@
 package org.thoughtcrime.securesms.video;
 
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +38,7 @@ import org.thoughtcrime.securesms.attachments.AttachmentServer;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.mms.PartAuthority;
 import org.thoughtcrime.securesms.mms.VideoSlide;
+import org.thoughtcrime.securesms.util.NavigationBarSizeUtil;
 import org.thoughtcrime.securesms.util.ViewUtil;
 import org.thoughtcrime.securesms.video.exo.AttachmentDataSourceFactory;
 
@@ -68,11 +71,18 @@ public class VideoPlayer extends FrameLayout {
     if (Build.VERSION.SDK_INT >= 16) {
       this.exoView   = ViewUtil.findById(this, R.id.video_view);
       this.videoView = null;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) setMediaControllerPadding();
     } else {
       this.videoView = ViewUtil.findById(this, R.id.video_view);
       this.exoView   = null;
       initializeVideoViewControls(videoView);
     }
+  }
+
+  @TargetApi(Build.VERSION_CODES.KITKAT)
+  public void setMediaControllerPadding() {
+    Rect navigationBarSize = NavigationBarSizeUtil.getNavigationBarSize(getContext());
+    exoView.getChildAt(1).setPadding(0, 0, navigationBarSize.right, navigationBarSize.bottom);
   }
 
   public void setVideoSource(@NonNull MasterSecret masterSecret, @NonNull VideoSlide videoSource)

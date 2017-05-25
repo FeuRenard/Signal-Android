@@ -65,8 +65,9 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
   private MasterSecret masterSecret;
 
-  private ZoomingImageView image;
-  private VideoPlayer      video;
+  private ZoomingImageView            image;
+  private VideoPlayer                 video;
+  private View.OnLayoutChangeListener onLayoutChangeListener;
 
   private Uri       mediaUri;
   private String    mediaType;
@@ -124,6 +125,10 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     dynamicLanguage.onResume(this);
     if (recipient != null) recipient.addListener(this);
     initializeMedia();
+
+    if (onLayoutChangeListener != null) {
+      findViewById(android.R.id.content).addOnLayoutChangeListener(onLayoutChangeListener);
+    }
   }
 
   @Override
@@ -131,6 +136,10 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     super.onPause();
     if (recipient != null) recipient.removeListener(this);
     cleanupMedia();
+
+    if (onLayoutChangeListener != null) {
+      findViewById(android.R.id.content).removeOnLayoutChangeListener(onLayoutChangeListener);
+    }
   }
 
   @Override
@@ -172,6 +181,16 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
         }
       }
     });
+
+    if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+      this.onLayoutChangeListener = new View.OnLayoutChangeListener() {
+        @Override
+        public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                   int oldLeft, int oldTop, int oldRight, int oldBottom) {
+          video.setMediaControllerPadding();
+        }
+      };
+    }
   }
 
   private void toggleBars() {
