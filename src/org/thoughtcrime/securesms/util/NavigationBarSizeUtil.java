@@ -22,6 +22,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.view.Display;
+import android.view.Surface;
 import android.view.WindowManager;
 
 public class NavigationBarSizeUtil {
@@ -35,6 +36,11 @@ public class NavigationBarSizeUtil {
     display.getSize(appUsableSize);
     display.getRealSize(realScreenSize);
 
-    return new Rect(0, 0, realScreenSize.x - appUsableSize.x, realScreenSize.y - appUsableSize.y);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+        display.getRotation() == Surface.ROTATION_270) {
+      return new Rect(realScreenSize.x - appUsableSize.x, 0, 0, realScreenSize.y - appUsableSize.y);
+    } else {
+      return new Rect(0, 0, realScreenSize.x - appUsableSize.x, realScreenSize.y - appUsableSize.y);
+    }
   }
 }

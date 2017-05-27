@@ -82,7 +82,8 @@ public class VideoPlayer extends FrameLayout {
   @TargetApi(Build.VERSION_CODES.KITKAT)
   public void setMediaControllerPadding() {
     Rect navigationBarSize = NavigationBarSizeUtil.getNavigationBarSize(getContext());
-    exoView.getChildAt(1).setPadding(0, 0, navigationBarSize.right, navigationBarSize.bottom);
+    exoView.getChildAt(1)
+           .setPadding(navigationBarSize.left, 0, navigationBarSize.right, navigationBarSize.bottom);
   }
 
   public void setVideoSource(@NonNull MasterSecret masterSecret, @NonNull VideoSlide videoSource)
