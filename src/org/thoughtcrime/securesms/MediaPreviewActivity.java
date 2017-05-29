@@ -16,7 +16,6 @@
  */
 package org.thoughtcrime.securesms;
 
-import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,7 +23,6 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
@@ -84,9 +82,6 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     dynamicLanguage.onCreate(this);
 
     setFullscreenIfPossible();
-    supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                         WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     setContentView(R.layout.media_preview_activity);
@@ -97,10 +92,12 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     initializeActionBar();
   }
 
-  @TargetApi(VERSION_CODES.JELLY_BEAN)
   private void setFullscreenIfPossible() {
     if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-      getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+      showBars();
+    } else {
+      supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+      getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
   }
 
@@ -154,14 +151,14 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     image.setOnViewTapListener(new OnViewTapListener() {
       @Override
       public void onViewTap(View view, float v, float v1) {
-        toggleActionBar();
+        toggleBars();
       }
     });
 
     image.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        toggleActionBar();
+        toggleBars();
       }
     });
 
@@ -169,18 +166,36 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
       @Override
       public void onVisibilityChange(int visibility) {
         if (visibility == View.VISIBLE) {
-          getSupportActionBar().show();
+          showBars();
         } else {
-          getSupportActionBar().hide();
+          hideBars();
         }
       }
     });
   }
 
-  private void toggleActionBar() {
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar.isShowing()) actionBar.hide();
-    else                       actionBar.show();
+  private void toggleBars() {
+    if (isFullscreen()) showBars();
+    else                hideBars();
+  }
+
+  private void hideBars() {
+    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+      getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN    |
+                                                       View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                                                       View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    } else {
+      getSupportActionBar().hide();
+    }
+  }
+
+  private void showBars() {
+    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+      getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                                                       View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    } else {
+      getSupportActionBar().show();
+    }
   }
 
   private void initializeResources() {
@@ -283,5 +298,13 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
   public static boolean isContentTypeSupported(final String contentType) {
     return contentType != null && (contentType.startsWith("image/") || contentType.startsWith("video/"));
+  }
+
+  private boolean isFullscreen() {
+    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+      return (getWindow().getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
+    } else {
+      return !getSupportActionBar().isShowing();
+    }
   }
 }
