@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import org.thoughtcrime.securesms.components.DragDismissFrameLayout;
 import org.thoughtcrime.securesms.components.ZoomingImageView;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.mms.VideoSlide;
@@ -140,6 +141,16 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
   private void initializeViews() {
     image = (ZoomingImageView) findViewById(R.id.image);
     video = (VideoPlayer) findViewById(R.id.video_player);
+
+    if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+      DragDismissFrameLayout draggableFrame = (DragDismissFrameLayout) findViewById(R.id.draggable_frame);
+      draggableFrame.setDragDismissListener(new DragDismissFrameLayout.DragDismissListener() {
+        @Override
+        public void onDragDismissed() {
+          finish();
+        }
+      });
+    }
   }
 
   private void initializeResources() {
