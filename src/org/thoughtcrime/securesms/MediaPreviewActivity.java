@@ -123,11 +123,17 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     Util.runOnMain(this::initializeActionBar);
   }
 
+  private void initializeActionBar() { initializeActionBar(false); }
+
   @SuppressWarnings("ConstantConditions")
-  private void initializeActionBar() {
+  private void initializeActionBar(boolean addRecipientListener) {
     MediaItem mediaItem = getCurrentMediaItem();
 
     if (mediaItem != null) {
+      if (addRecipientListener && mediaItem.recipient != null) {
+        mediaItem.recipient.addListener(MediaPreviewActivity.this);
+      }
+
       CharSequence relativeTimeSpan;
 
       if (mediaItem.date > 0) {
@@ -319,15 +325,7 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
     @Override
     public void onPageSelected(int position) {
       super.onPageSelected(position);
-
-      MediaItemAdapter adapter = (MediaItemAdapter)mediaPager.getAdapter();
-
-      if (adapter != null) {
-        MediaItem item = adapter.getMediaItemFor(position);
-        if (item.recipient != null) item.recipient.addListener(MediaPreviewActivity.this);
-
-        initializeActionBar();
-      }
+      initializeActionBar(true);
     }
 
 
