@@ -206,6 +206,7 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
       getSupportLoaderManager().restartLoader(0, null, this);
     } else {
       mediaPager.setAdapter(new SingleItemPagerAdapter(this, GlideApp.with(this), getWindow(), initialMediaUri, initialMediaType, initialMediaSize));
+      initializeActionBar(false);
     }
   }
 
@@ -312,6 +313,8 @@ public class MediaPreviewActivity extends PassphraseRequiredActionBarActivity im
 
       if (restartItem < 0) mediaPager.setCurrentItem(data.second);
       else                 mediaPager.setCurrentItem(restartItem);
+
+      if (mediaPager.getCurrentItem() == 0) initializeActionBar(true);
     }
   }
 
